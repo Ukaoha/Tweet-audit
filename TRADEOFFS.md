@@ -5,7 +5,7 @@ This document summarizes the architectural choices for `tweet-audit`.
 ## 1. Language & Concurrency: Go
 **Decision:** Used Go for the core implementation.
 **Reasoning:** 
-- **Concurrency primitives**: Go’s goroutines and channels are significantly more efficient than OS threads or the `async/await` event loop found in JavaScript. With Concurrency I can manage thousands of concurrent tasks with minimal memory overhead (kilobytes instead of megabytes per task).
+- **Concurrency primitives**: I used Go’s goroutines and channels because they  are significantly more efficient than OS threads or the `async/await` event loop  in JavaScript. With Concurrency I can manage thousands of concurrent tasks with minimal memory overhead (kilobytes instead of megabytes per task).
 - **Type Safety**: Using Go ensures that criteria parsing and API response handling are verified at compile time, reducing the risk of runtime crashes compared to dynamic languages.
 **Tradeoff:** Go has a stricter type system and more verbose error handling than Python, which slightly increased initial development time but ensures the tool is predictable and reliable under load.
 
