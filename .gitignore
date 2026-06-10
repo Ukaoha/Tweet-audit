@@ -1,0 +1,32 @@
+# Compiled binary
+tweet-audit
+
+# API Keys & Secrets
+.env
+.env.local
+
+# Local state & reports
+# We ignore these because they contain personal audit results and shouldn't be shared
+audit-checkpoint.json
+audit-checkpoint.json.reset
+flagged-tweets.csv
+*.tmp
+
+# Twitter Archive Data
+# Your personal archive data should NEVER be committed
+twitter-*/
+data/
+
+# Go dependencies & workspace
+vendor/
+go.work
+go.work.sum
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

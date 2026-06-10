@@ -1,0 +1,11 @@
+{
+  "forbidden_words": [  "sex", " Dickson" , "Bank" , "unpopular opinion" , "Religion"],
+  "professional_check": true,
+  "tone": "respectful and thoughtful",
+  "exclude_politics": false,
+  "custom_rules": [],
+  "include_replies": true,
+  "include_retweets": false,
+  "min_favorites_to_keep": 0,
+  "min_retweets_to_keep": 0
+}
