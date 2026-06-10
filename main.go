@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"tweet-audit/archive"
 	"tweet-audit/audit"
@@ -24,6 +25,8 @@ func main() {
 	checkpointFile := flag.String("checkpoint", "audit-checkpoint.json", "path to checkpoint file for resumable audits")
 	dryRun := flag.Bool("dry-run", false, "print verdicts without writing CSV")
 	limit := flag.Int("limit", 0, "limit audit to first N tweets (0 = all)")
+	rateLimit := flag.Float64("rate-limit", 100.0, "requests per second (e.g. 0.05 for 1 every 20s)")
+	workers := flag.Int("workers", 8, "number of concurrent workers")
 	flag.Parse()
 
 	if *dataDir == "" {
@@ -61,7 +64,7 @@ func main() {
 	}
 
 	// Create auditor
-	client := gemini.NewClient(apiKey)
+	client := gemini.NewClientWithLimits(apiKey, *rateLimit, 500*time.Millisecond)
 	auditor := audit.NewAuditor(client, criteria, account.Username)
 
 	// Determine tweet slice
@@ -72,7 +75,7 @@ func main() {
 	}
 
 	// Run audit with persistence
-	verdicts := auditConcurrent(ctx, auditor, tweets[:toAudit], *checkpointFile)
+	verdicts := auditConcurrent(ctx, auditor, tweets[:toAudit], *checkpointFile, *workers)
 	fmt.Printf("Audit complete: %d verdicts processed\n", len(verdicts))
 
 	// Count flagged
@@ -104,8 +107,7 @@ func main() {
 // auditConcurrent processes tweets concurrently using worker goroutines.
 // It loads a checkpoint file to skip already-processed tweets and saves each
 // verdict to disk immediately so interrupted runs can resume safely.
-func auditConcurrent(ctx context.Context, auditor *audit.Auditor, tweets []archive.Tweet, checkpointPath string) []audit.Verdict {
-	const numWorkers = 8
+func auditConcurrent(ctx context.Context, auditor *audit.Auditor, tweets []archive.Tweet, checkpointPath string, numWorkers int) []audit.Verdict {
 	const batchSize = 100
 
 	// Load existing checkpoint (empty store if file doesn't exist)

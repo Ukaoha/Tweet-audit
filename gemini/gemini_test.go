@@ -90,21 +90,21 @@ func TestIsRetryable(t *testing.T) {
 func TestNewClientWithLimits(t *testing.T) {
 	tests := []struct {
 		name              string
-		requestsPerSecond int
+		requestsPerSecond float64
 		retryDelay        time.Duration
 		wantMaxRetries    int
 		wantRetryDelay    time.Duration
 	}{
 		{
 			name:              "default 100 req/sec",
-			requestsPerSecond: 100,
+			requestsPerSecond: 100.0,
 			retryDelay:        500 * time.Millisecond,
 			wantMaxRetries:    3,
 			wantRetryDelay:    500 * time.Millisecond,
 		},
 		{
 			name:              "50 req/sec",
-			requestsPerSecond: 50,
+			requestsPerSecond: 50.0,
 			retryDelay:        1 * time.Second,
 			wantMaxRetries:    3,
 			wantRetryDelay:    1 * time.Second,

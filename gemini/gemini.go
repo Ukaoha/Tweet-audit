@@ -22,11 +22,11 @@ type Client struct {
 }
 
 func NewClient(apiKey string) *Client {
-	return NewClientWithLimits(apiKey, 100, 500*time.Millisecond)
+	return NewClientWithLimits(apiKey, 100.0, 500*time.Millisecond)
 }
 
-func NewClientWithLimits(apiKey string, requestsPerSecond int, retryDelay time.Duration) *Client {
-	interval := time.Second / time.Duration(requestsPerSecond)
+func NewClientWithLimits(apiKey string, requestsPerSecond float64, retryDelay time.Duration) *Client {
+	interval := time.Duration(float64(time.Second) / requestsPerSecond)
 	limiter := time.NewTicker(interval).C
 
 	return &Client{
