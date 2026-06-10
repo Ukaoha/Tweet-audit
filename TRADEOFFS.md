@@ -5,7 +5,7 @@ This document summarizes the architectural choices for `tweet-audit`.
 ## 1. Language & Concurrency: Go
 **Decision:** Used Go for the core implementation.
 **Reasoning:** 
-- **Concurrency primitives**: I used Go’s goroutines and channels because they are significantly more efficient than OS threads or the `async/await` event loop in JavaScript. I can manage thousands of concurrent tasks with minimal memory overhead (kilobytes instead of megabytes per task).
+- **Concurrency primitives**: I used Go’s goroutines and channels because they are significantly more efficient than OS threads or the `async/await` event loop in JavaScript.With Go, I can manage thousands of concurrent tasks with minimal memory overhead (kilobytes instead of megabytes per task).
 - **Static Binary**: Go compiles all dependencies into a single executable. This is a massive win for a CLI tool, as users don't need to install or manage a runtime environment (like a Python interpreter or Node.js) to run the audit.
 **Tradeoff:** Go has a stricter type system and more verbose error handling than Python, which slightly increased development time but ensures the tool is predictable and reliable under load.
 
