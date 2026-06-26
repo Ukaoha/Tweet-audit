@@ -108,7 +108,9 @@ func (a *Auditor) formatCriteria() string {
 func (a *Auditor) parseResponse(response string) (bool, string) {
 	response = strings.TrimSpace(response)
 
-	flag := strings.Contains(strings.ToLower(response), "flag: yes")
+	// Normalize: remove all spaces and lowercase for robust matching
+	normalised := strings.ReplaceAll(strings.ToLower(response), " ", "")
+	flag := strings.Contains(normalised, "flag:yes")
 
 	reason := response
 	if idx := strings.Index(response, "REASON:"); idx != -1 {

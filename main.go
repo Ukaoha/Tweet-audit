@@ -110,11 +110,11 @@ func main() {
 func auditConcurrent(ctx context.Context, auditor *audit.Auditor, tweets []archive.Tweet, checkpointPath string, numWorkers int) []audit.Verdict {
 	const batchSize = 100
 
-	// Load existing checkpoint (empty store if file doesn't exist)
+	// Load existing checkpoint (start fresh on error or if missing)
 	cp, err := checkpoint.Load(checkpointPath)
 	if err != nil {
-		log.Printf("warning: could not load checkpoint: %v (starting fresh)", err)
-		cp, _ = checkpoint.Load(checkpointPath + ".reset")
+		log.Printf("warning: corrupt checkpoint (%v), starting fresh", err)
+		cp = checkpoint.New(checkpointPath)
 	}
 
 	skipped := cp.Len()
@@ -171,13 +171,24 @@ func auditConcurrent(ctx context.Context, auditor *audit.Auditor, tweets []archi
 	}()
 
 	var mu sync.Mutex
+	count := 0
 	for v := range resultChan {
 		mu.Lock()
 		cp.Add(v)
-		if err := cp.Save(); err != nil {
-			log.Printf("warning: checkpoint save failed: %v", err)
+		count++
+
+		// Batch save every 50 verdicts to reduce I/O overhead
+		if count%50 == 0 {
+			if err := cp.Save(); err != nil {
+				log.Printf("warning: checkpoint save failed: %v", err)
+			}
 		}
 		mu.Unlock()
+	}
+
+	// Final save
+	if err := cp.Save(); err != nil {
+		log.Printf("warning: final checkpoint save failed: %v", err)
 	}
 
 	// Return all verdicts (previously stored + newly processed)

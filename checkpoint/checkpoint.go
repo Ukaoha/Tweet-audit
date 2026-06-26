@@ -16,6 +16,14 @@ type Store struct {
 	verdicts map[string]audit.Verdict
 }
 
+// New initializes an empty Store at the given path.
+func New(path string) *Store {
+	return &Store{
+		path:     path,
+		verdicts: make(map[string]audit.Verdict),
+	}
+}
+
 // Load reads an existing checkpoint file from path.
 // If the file does not exist, an empty Store is returned (not an error).
 func Load(path string) (*Store, error) {

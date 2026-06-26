@@ -17,7 +17,6 @@ func WriteCSV(path string, verdicts []audit.Verdict) error {
 	defer file.Close()
 
 	w := csv.NewWriter(file)
-	defer w.Flush()
 
 	// Header
 	w.Write([]string{"Tweet URL", "Tweet Text", "Created At", "Flag", "Reason"})
@@ -27,5 +26,10 @@ func WriteCSV(path string, verdicts []audit.Verdict) error {
 		w.Write([]string{v.URL, v.Text, v.CreatedAt, fmt.Sprintf("%v", v.Flag), v.Reason})
 	}
 
-	return w.Error()
+	w.Flush()
+	if err := w.Error(); err != nil {
+		return fmt.Errorf("flushing csv: %w", err)
+	}
+
+	return nil
 }
